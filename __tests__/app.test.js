@@ -70,6 +70,15 @@ describe("GET /api/articles/:article_id", () => {
 				expect(msg).toEqual("No article found for article_id 999999");
 			});
 	});
+  test("status:400, responds with 404 not found when passed id that is not number", () => {
+		return request(app)
+			.get("/api/articles/banana")
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
 });
 
 describe("PATCH /api/articles/:article_id", () => {
@@ -110,6 +119,32 @@ describe("PATCH /api/articles/:article_id", () => {
 			.then(({ body }) => {
 				const { msg } = body;
 				expect(msg).toEqual("No article found for article_id 999999");
+			});
+	});
+  test("status:400, responds with 404 not found when passed id that is not number", () => {
+    const votesObject = {
+			inc_votes: -10,
+		};
+		return request(app)
+			.patch("/api/articles/banana")
+			.send(votesObject)
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+  test("status:400, responds with 404 not found when passed inc_votes that is not number", () => {
+    const votesObject = {
+			inc_votes: "cheese",
+		};
+		return request(app)
+			.patch("/api/articles/2")
+			.send(votesObject)
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
 			});
 	});
 });
