@@ -21,7 +21,7 @@ afterAll(() => {
         .then(({ body }) => {
           const { topics } = body;
           expect(topics).toBeInstanceOf(Array);
-          
+          expect(topics.length).toBe(3)
           topics.forEach((topic) => {
             expect(topic).toEqual(
               expect.objectContaining({
