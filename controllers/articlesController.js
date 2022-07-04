@@ -1,4 +1,4 @@
-const {fetchArticleById, updateArticleVotes} = require("../models/articlesModel")
+const {fetchArticleById, updateArticleVotes, getArticleVotes} = require("../models/articlesModel")
 
 const getArticleById = (req, res, next) => {
     const {article_id : articleId} = req.params

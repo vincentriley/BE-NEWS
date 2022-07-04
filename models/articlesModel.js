@@ -14,8 +14,8 @@ const fetchArticleById = (articleId) => {
     })
 }
 
-const updateArticleVotes = (articleId) => {
-    return db.query("", [articleId])
+const updateArticleVotes = (articleId, votes) => {
+    return db.query("UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *", [votes, articleId])
     .then(({rows}) => {
         const article = rows[0]
         if (!article) {
@@ -27,5 +27,7 @@ const updateArticleVotes = (articleId) => {
         return article
     })
 }
+
+
 
 module.exports = {fetchArticleById, updateArticleVotes}
