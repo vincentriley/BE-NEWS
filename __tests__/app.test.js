@@ -13,6 +13,7 @@ afterAll(() => {
 	db.end();
 });
 
+
 describe("GET /api/topics", () => {
 	test("status:200, responds with an array of topic objects", () => {
 		return request(app)
@@ -42,6 +43,7 @@ describe("GET /api/topics", () => {
 			});
 	});
 });
+
 
 describe("GET /api/articles/:article_id", () => {
 	test("status:200, responds with article object", () => {
@@ -148,3 +150,4 @@ describe("PATCH /api/articles/:article_id", () => {
 			});
 	});
 });
+

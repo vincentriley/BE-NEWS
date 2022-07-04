@@ -1,6 +1,10 @@
 const {fetchArticleById, updateArticleVotes, getArticleVotes} = require("../models/articlesModel")
 
 const getArticleById = (req, res, next) => {
+    let commentCount = null
+    if (req.queries) {
+        
+    }
     const {article_id : articleId} = req.params
     fetchArticleById(articleId).then((data) => {
         res.status(200).send({article: data})
