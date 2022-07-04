@@ -1,13 +1,15 @@
 const express = require("express");
 const {getTopics} = require("./controllers/topicsController")
-const {getArticleById} = require("./controllers/articlesController")
+const {getArticleById, patchArticleById} = require("./controllers/articlesController")
 
 const app = express();
 app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
-app.get("/api")
+app.get("/api/articles/:article_id", getArticleById)
+
+app.patch("/api/articles/:article_id", patchArticleById)
 
 
 
@@ -19,13 +21,18 @@ app.get("/api")
 
 
 
-
-app.use("*", (req, res) => {
-    res.status(404).send({msg: "Not found"})
-})
 
 app.use((err, req, res, next) => {
-    res.status(404).send(err)
+    if (err.msg && err.status) {
+        res.status(err.status).send({msg: err.msg})
+    } else {
+        res.status(404).send({msg: "Not found"})
+    }
+    
+})
+
+app.use("*", (req, res) => {
+    res.status(404).send({msg: "Bad path"})
 })
 
 module.exports = app;
