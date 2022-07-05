@@ -1,4 +1,4 @@
-const {fetchArticleById, updateArticleVotes, getArticleVotes} = require("../models/articlesModel")
+const {fetchArticleById, updateArticleVotes, fetchArticleComments} = require("../models/articlesModel")
 
 const getArticleById = (req, res, next) => {
     const {article_id : articleId} = req.params
@@ -19,4 +19,16 @@ const patchArticleById = (req, res, next) => {
     })
 }
 
-module.exports = {getArticleById, patchArticleById}
+const getArticleComments = (req, res, next) => {
+    const {article_id : articleId} = req.params
+    fetchArticleById(articleId).then(() => {
+        fetchArticleComments(articleId).then((data) => {
+            res.status(200).send({comments: data})
+        })
+    }).catch((err) => {
+        next(err)
+    })
+    
+}
+
+module.exports = {getArticleById, patchArticleById, getArticleComments}

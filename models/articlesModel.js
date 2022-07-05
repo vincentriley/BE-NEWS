@@ -1,12 +1,6 @@
 const db = require("../db/connection.js");
 
 const fetchArticleById = (articleId) => {
-	// if (isNaN(parseInt(articleId))) {
-	// 	return Promise.reject({
-	// 		status: 400,
-	// 		msg: "Bad request",
-	// 	});
-	// }
 	return db
 		.query(
 			`SELECT articles.*, CAST(COUNT(comments.article_id) AS int) AS comment_count FROM articles
@@ -52,4 +46,12 @@ const updateArticleVotes = (articleId, votes) => {
 		});
 };
 
-module.exports = { fetchArticleById, updateArticleVotes };
+const fetchArticleComments = (articleId) => {
+	return db
+		.query("SELECT * FROM comments WHERE article_id = $1", [articleId])
+		.then(({rows}) => {
+			return rows
+		});
+};
+
+module.exports = { fetchArticleById, updateArticleVotes, fetchArticleComments };
