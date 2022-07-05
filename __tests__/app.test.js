@@ -153,7 +153,7 @@ describe("PATCH /api/articles/:article_id", () => {
 });
 
 
-  describe.only("GET /api/users", () => {
+  describe("GET /api/users", () => {
 	test("status: 200, responds with array of users", () => {
 	  return request(app)
 	  .get("/api/users")
@@ -176,7 +176,7 @@ describe("PATCH /api/articles/:article_id", () => {
   })
 
 
-  describe.only("GET /api/articles", () => {
+  describe("GET /api/articles", () => {
 	test("status: 200, responds with array of articles", () => {
 	  return request(app)
 	  .get("/api/articles")
