@@ -201,3 +201,16 @@ describe("PATCH /api/articles/:article_id", () => {
 	  });
 	})
   })
+
+// describe.only("POST /api/articles/:article_id/comments", () => {
+// 	test("returns a correctly formatted comment object", () => {
+// 		const commentObject = {
+// 			username: "butter_bridge",
+// 			body: "Leeds United Champions League champions 2024"
+// 		}
+// 		return request(app)
+// 		.post("/api/articles/2/comments")
+// 		.send(commentObject)
+// 		.expect(201)
+// 	})
+// })

@@ -1,4 +1,4 @@
-const {fetchArticles, fetchArticleById, updateArticleVotes, getArticleVotes} = require("../models/articlesModel")
+const {fetchArticles, fetchArticleById, updateArticleVotes, addComment} = require("../models/articlesModel")
 
 const getArticles = (req, res, next) => {
     fetchArticles().then((data) => {
@@ -27,4 +27,22 @@ const patchArticleById = (req, res, next) => {
     })
 }
 
-module.exports = {getArticles, getArticleById, patchArticleById}
+const postComment = (req, res, next) => {
+    const {article_id : articleId} = req.params
+    const {username, body} = req.body
+    console.log(ar)
+    fetchArticleById(articleId).then((data) => {
+        addComment(articleId, username, body).then((data) => {
+            res.status(201).send({comment: data})
+        }).catch((err) => {
+            err.msg = "Invalid username"
+            next(err)
+        })
+    }).catch((err) => {
+        console.log(err, "fetchArticleError")
+        err.msg = "Article not found"
+        next(err)
+    })
+}
+
+module.exports = {getArticles, getArticleById, patchArticleById, postComment}

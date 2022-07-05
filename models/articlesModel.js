@@ -60,4 +60,19 @@ const updateArticleVotes = (articleId, votes) => {
 		});
 };
 
+const addComment = (articleId, username, body) => {
+	const timeNow = Date.now();
+	console.log(timeNow);
+	return db
+		.query(
+			`INSERT INTO comments (body, votes, author, article_id, created_at)
+					VALUES($1, 0, $2, $3, $4) RETURNING *`,
+			[body, username, articleId, timeNow]
+		)
+		.then(({rows}) => {
+			const comment = rows[0]
+			return comment
+		});
+};
+
 module.exports = { fetchArticles, fetchArticleById, updateArticleVotes };
