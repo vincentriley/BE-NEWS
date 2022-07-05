@@ -1,12 +1,20 @@
 const db = require("../db/connection.js");
 
+const fetchArticles = () => {
+	return db
+		.query(
+			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.article_id) AS int) AS comment_count FROM articles
+		LEFT JOIN comments 
+		ON articles.article_id = comments.article_id
+		GROUP BY articles.article_id
+		ORDER BY articles.created_at DESC;`
+		)
+		.then(({ rows }) => {
+			return rows;
+		});
+};
+
 const fetchArticleById = (articleId) => {
-	// if (isNaN(parseInt(articleId))) {
-	// 	return Promise.reject({
-	// 		status: 400,
-	// 		msg: "Bad request",
-	// 	});
-	// }
 	return db
 		.query(
 			`SELECT articles.*, CAST(COUNT(comments.article_id) AS int) AS comment_count FROM articles
@@ -52,4 +60,4 @@ const updateArticleVotes = (articleId, votes) => {
 		});
 };
 
-module.exports = { fetchArticleById, updateArticleVotes };
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes };
