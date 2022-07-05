@@ -1,18 +1,8 @@
 const {fetchArticleById, updateArticleVotes, getArticleVotes} = require("../models/articlesModel")
 
 const getArticleById = (req, res, next) => {
-    let commentCount = false
-    if (req.query.comment_count && req.query.comment_count !== "true" && req.query.comment_count !== "false") {
-        next({
-            status: 400,
-		 	msg: "Invalid query parameter"
-        })
-    }
-    if (req.query.comment_count === "true") {
-        commentCount = true
-    }
     const {article_id : articleId} = req.params
-    fetchArticleById(articleId, commentCount).then((data) => {
+    fetchArticleById(articleId).then((data) => {
         res.status(200).send({article: data})
     }).catch((err) => {
         next(err)
