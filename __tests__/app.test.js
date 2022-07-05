@@ -13,6 +13,7 @@ afterAll(() => {
 	db.end();
 });
 
+
 describe("GET /api/topics", () => {
 	test("status:200, responds with an array of topic objects", () => {
 		return request(app)
@@ -43,6 +44,7 @@ describe("GET /api/topics", () => {
 	});
 });
 
+
 describe("GET /api/articles/:article_id", () => {
 	test("status:200, responds with article object", () => {
 		return request(app)
@@ -58,6 +60,7 @@ describe("GET /api/articles/:article_id", () => {
 					body: expect.any(String),
 					created_at: expect.any(String),
 					votes: expect.any(Number),
+					comment_count: expect.any(Number)
 				});
 			});
 	});
@@ -149,24 +152,4 @@ describe("PATCH /api/articles/:article_id", () => {
 	});
 });
 
-describe("GET /api/users", () => {
-  test("status: 200, responds with array of users", () => {
-    return request(app)
-    .get("/api/users")
-    .expect(200)
-    .then(({ body }) => {
-      const { users } = body;
-      expect(users).toBeInstanceOf(Array);
-      expect(users.length).toBe(4);
-      users.forEach((user) => {
-        expect(user).toEqual(
-          expect.objectContaining({
-            name: expect.any(String),
-            username: expect.any(String),
-            avatar_url: expect.any(String),
-          })
-        );
-      });
-    });
-  })
-})
+
