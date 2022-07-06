@@ -1,9 +1,9 @@
-const { forEach } = require("../db/data/test-data/articles");
 const {
 	fetchArticles,
 	fetchArticleById,
 	updateArticleVotes,
 	addComment,
+	fetchArticleComments,
 } = require("../models/articlesModel");
 
 const getArticles = (req, res, next) => {
@@ -52,4 +52,24 @@ const postComment = (req, res, next) => {
 		});
 };
 
-module.exports = { getArticles, getArticleById, patchArticleById, postComment };
+const getArticleComments = (req, res, next) => {
+	const { article_id: articleId } = req.params;
+	const pendingComments = fetchArticleComments(articleId);
+	const pendingArticleCheck = fetchArticleById(articleId);
+
+	Promise.all([pendingComments, pendingArticleCheck])
+		.then(([data]) => {
+			res.status(200).send({ comments: data });
+		})
+		.catch((err) => {
+			next(err);
+		});
+};
+
+module.exports = {
+	getArticles,
+	getArticleById,
+	patchArticleById,
+	postComment,
+	getArticleComments,
+};
