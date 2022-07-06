@@ -1,9 +1,35 @@
 const db = require("../db/connection.js");
 
 const fetchArticles = (sortBy, order, topic) => {
-	const sortByString = sortBy ? sortBy : "created_at"
-	const orderString = order ? order : "DESC"
-	const topicString = topic ? `WHERE articles.topic = '${topic}'` : ""
+	const allowedSortBys = [
+		"author",
+		"title",
+		"article_id",
+		"topic",
+		"created_at",
+		"votes",
+		"comment_count",
+	];
+	const allowedOrderByBools = ["true", "false"];
+	console.log(!allowedSortBys.includes(sortBy), "bool")
+	if (!allowedSortBys.includes(sortBy)) {
+		console.log("in conditional")
+		return Promise.reject({
+			status: 400,
+			msg: "Bad request",
+		});
+	}
+	console.log(order, "order")
+	if (order && !allowedOrderByBools.includes(order)) {
+		console.log("in conditional2")
+		return Promise.reject({
+			status: 400,
+			msg: "Bad request",
+		});
+	}
+	const sortByString = sortBy ? sortBy : "created_at";
+	const orderString = order ? order : "DESC";
+	const topicString = topic ? `WHERE articles.topic = '${topic}'` : "";
 	return db
 		.query(
 			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.article_id) AS int) AS comment_count FROM articles
@@ -13,7 +39,7 @@ const fetchArticles = (sortBy, order, topic) => {
 			GROUP BY articles.article_id
 			ORDER BY articles.${sortByString} ${orderString};`
 		)
-		.then(({rows}) => {
+		.then(({ rows }) => {
 			return rows;
 		});
 };
@@ -64,7 +90,6 @@ const updateArticleVotes = (articleId, votes) => {
 		});
 };
 
-
 const fetchArticleComments = (articleId) => {
 	return db
 		.query("SELECT * FROM comments WHERE article_id = $1", [articleId])
@@ -73,5 +98,9 @@ const fetchArticleComments = (articleId) => {
 		});
 };
 
-module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments };
-
+module.exports = {
+	fetchArticles,
+	fetchArticleById,
+	updateArticleVotes,
+	fetchArticleComments,
+};

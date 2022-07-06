@@ -38,12 +38,16 @@ const patchArticleById = (req, res, next) => {
 const getArticleComments = (req, res, next) => {
 	const { article_id: articleId } = req.params;
 	const promise1 = fetchArticleById(articleId);
-	const promise2 = fetchArticleComments(articleId).then((data) => {
-		res.status(200).send({ comments: data });
-	});
+	const promise2 = fetchArticleComments(articleId)
 
 
 	Promise.all([promise1, promise2]).catch((err) => {
+		next(err);
+	})
+	.then((data) => {
+		res.status(200).send({ comments: data });
+	})
+	.catch((err) => {
 		next(err);
 	});
 };
