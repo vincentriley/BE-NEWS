@@ -4,6 +4,7 @@ const {
 	updateArticleVotes,
 	addComment,
 	fetchArticleComments,
+	removeComment
 } = require("../models/articlesModel");
 
 const getArticles = (req, res, next) => {
@@ -66,10 +67,20 @@ const getArticleComments = (req, res, next) => {
 		});
 };
 
+const deleteComment = (req, res, next) => {
+	const {comment_id : commentId} = req.params
+	removeComment(commentId).then((data) => {
+		res.status(204).send()
+	}).catch((err) => {
+		next(err)
+	})
+}
+
 module.exports = {
 	getArticles,
 	getArticleById,
 	patchArticleById,
 	postComment,
 	getArticleComments,
+	deleteComment
 };
