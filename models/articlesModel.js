@@ -1,15 +1,19 @@
 const db = require("../db/connection.js");
 
-const fetchArticles = () => {
+const fetchArticles = (sortBy, order, topic) => {
+	const sortByString = sortBy ? sortBy : "created_at"
+	const orderString = order ? order : "DESC"
+	const topicString = topic ? `WHERE articles.topic = '${topic}'` : ""
 	return db
 		.query(
 			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.article_id) AS int) AS comment_count FROM articles
-		LEFT JOIN comments 
-		ON articles.article_id = comments.article_id
-		GROUP BY articles.article_id
-		ORDER BY articles.created_at DESC;`
+			LEFT JOIN comments 
+			ON articles.article_id = comments.article_id
+			${topicString}
+			GROUP BY articles.article_id
+			ORDER BY articles.${sortByString} ${orderString};`
 		)
-		.then(({ rows }) => {
+		.then(({rows}) => {
 			return rows;
 		});
 };

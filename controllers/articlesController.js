@@ -2,7 +2,8 @@
 const {fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments} = require("../models/articlesModel")
 
 const getArticles = (req, res, next) => {
-    fetchArticles().then((data) => {
+	const {sort_by : sortBy, order, topic} = req.query
+    fetchArticles(sortBy, order, topic).then((data) => {
         res.status(200).send({articles: data})
     }).catch((err) => {
         next(err)
