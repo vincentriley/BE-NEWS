@@ -122,8 +122,8 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(msg).toEqual("Not found");
 			});
 	});
-	test("status:400, responds with 404 not found when passed id that is not number", () => {
-		const votesObject = {
+  test("status:400, responds with 400 not found when passed id that is not number", () => {
+    const votesObject = {
 			inc_votes: -10,
 		};
 		return request(app)
@@ -135,8 +135,8 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(msg).toEqual("Bad request");
 			});
 	});
-	test("status:400, responds with 404 not found when passed inc_votes that is not number", () => {
-		const votesObject = {
+  test("status:400, responds with 400 when passed inc_votes that is not number", () => {
+    const votesObject = {
 			inc_votes: "cheese",
 		};
 		return request(app)
@@ -193,9 +193,9 @@ describe(" /api/articles/:article_id/comments", () => {
 				expect(comments.length).toBe(0);
 			});
 	});
-	test("status:404, responds with 404 not found when passed non-existent id", () => {
+	test("status:404, responds with 404 not found when passed non-existent article_id", () => {
 		return request(app)
-			.get("/api/articles/9998999/comments")
+			.get("/api/articles/5555/comments")
 			.expect(404)
 			.then(({ body }) => {
 				const { msg } = body;
@@ -254,3 +254,84 @@ describe(" /api/articles/:article_id/comments", () => {
 	})
   })
 
+describe("POST /api/articles/:article_id/comments", () => {
+	test("returns a correctly formatted comment object", () => {
+		const commentObject = {
+			username: "butter_bridge",
+			body: "Leeds United Champions League Champions 2024"
+		}
+		return request(app)
+		.post("/api/articles/2/comments")
+		.send(commentObject)
+		.expect(201)
+		.then(({body}) => {
+			const {comment} = body
+			expect(comment).toEqual(
+				expect.objectContaining({
+					comment_id: expect.any(Number),
+					body: expect.any(String),
+					article_id: expect.any(Number),
+					author: expect.any(String),
+					votes: expect.any(Number),
+					created_at: expect.any(String),
+
+				})
+			)
+		})
+	})
+	test("returns with 404 when article_id not found", () => {
+		const commentObject = {
+			username: "butter_bridge",
+			body: "Leeds United Champions League Champions 2024"
+		}
+		return request(app)
+		.post("/api/articles/9999999/comments")
+		.send(commentObject)
+		.expect(404)
+		.then(({ body }) => {
+			const { msg } = body;
+			expect(msg).toEqual("Not found");
+		});
+	})
+	test("returns with 404 when username not found", () => {
+		const commentObject = {
+			username: "Dave_Hockaday",
+			body: "Leeds United Champions League Champions 2024"
+		}
+		return request(app)
+		.post("/api/articles/2/comments")
+		.send(commentObject)
+		.expect(404)
+		.then(({ body }) => {
+			const { msg } = body;
+			expect(msg).toEqual("Not found");
+		});
+	})
+	test("returns 400 when passed invalid article_id format", () => {
+		const commentObject = {
+			username: "Dave_Hockaday",
+			body: "Leeds United Champions League Champions 2024"
+		}
+		return request(app)
+		.post("/api/articles/MassimoCellino/comments")
+		.send(commentObject)
+		.expect(400)
+		.then(({ body }) => {
+			const { msg } = body;
+			expect(msg).toEqual("Bad request");
+		});
+	})
+	test("returns 400 when passed comment body with missing fields", () => {
+		const commentObject = {
+			username: "Dave_Hockaday"
+		}
+		return request(app)
+		.post("/api/articles/MassimoCellino/comments")
+		.send(commentObject)
+		.expect(400)
+		.then(({ body }) => {
+			const { msg } = body;
+			expect(msg).toEqual("Bad request");
+		});
+	})
+})

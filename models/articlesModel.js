@@ -1,4 +1,5 @@
 const db = require("../db/connection.js");
+const convertTimeStampToDate = require("../db/helpers/utils")
 
 const fetchArticles = () => {
 	return db
@@ -61,6 +62,20 @@ const updateArticleVotes = (articleId, votes) => {
 };
 
 
+const addComment = (articleId, username, body) => {
+	return db
+		.query(
+			`INSERT INTO comments (body, author, article_id)
+					VALUES($1, $2, $3) RETURNING *`,
+			[body, username, articleId]
+		)
+		.then(({rows}) => {
+			const comment = rows[0]
+			return comment
+		});
+};
+
+
 const fetchArticleComments = (articleId) => {
 	return db
 		.query("SELECT * FROM comments WHERE article_id = $1", [articleId])
@@ -69,5 +84,5 @@ const fetchArticleComments = (articleId) => {
 		});
 };
 
-module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments };
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment };
 
