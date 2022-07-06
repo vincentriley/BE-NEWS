@@ -202,7 +202,7 @@ describe("PATCH /api/articles/:article_id", () => {
 	})
   })
 
-describe.only("POST /api/articles/:article_id/comments", () => {
+describe("POST /api/articles/:article_id/comments", () => {
 	test("returns a correctly formatted comment object", () => {
 		const commentObject = {
 			username: "butter_bridge",
