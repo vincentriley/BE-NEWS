@@ -29,7 +29,7 @@ const fetchArticleById = (articleId) => {
 			if (!article) {
 				return Promise.reject({
 					status: 404,
-					msg: `No article found for article_id ${articleId}`,
+					msg: `Not found`,
 				});
 			}
 			return article;
@@ -53,11 +53,21 @@ const updateArticleVotes = (articleId, votes) => {
 			if (!article) {
 				return Promise.reject({
 					status: 404,
-					msg: `No article found for article_id ${articleId}`,
+					msg: `Not found`,
 				});
 			}
 			return article;
 		});
 };
 
-module.exports = { fetchArticles, fetchArticleById, updateArticleVotes };
+
+const fetchArticleComments = (articleId) => {
+	return db
+		.query("SELECT * FROM comments WHERE article_id = $1", [articleId])
+		.then(({ rows }) => {
+			return rows;
+		});
+};
+
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments };
+

@@ -13,7 +13,6 @@ afterAll(() => {
 	db.end();
 });
 
-
 describe("GET /api/topics", () => {
 	test("status:200, responds with an array of topic objects", () => {
 		return request(app)
@@ -44,7 +43,6 @@ describe("GET /api/topics", () => {
 	});
 });
 
-
 describe("GET /api/articles/:article_id", () => {
 	test("status:200, responds with article object", () => {
 		return request(app)
@@ -60,7 +58,7 @@ describe("GET /api/articles/:article_id", () => {
 					body: expect.any(String),
 					created_at: expect.any(String),
 					votes: expect.any(Number),
-					comment_count: expect.any(Number)
+					comment_count: expect.any(Number),
 				});
 			});
 	});
@@ -70,10 +68,10 @@ describe("GET /api/articles/:article_id", () => {
 			.expect(404)
 			.then(({ body }) => {
 				const { msg } = body;
-				expect(msg).toEqual("No article found for article_id 999999");
+				expect(msg).toEqual("Not found");
 			});
 	});
-  test("status:400, responds with 404 not found when passed id that is not number", () => {
+	test("status:400, responds with 404 not found when passed id that is not number", () => {
 		return request(app)
 			.get("/api/articles/banana")
 			.expect(400)
@@ -112,7 +110,7 @@ describe("PATCH /api/articles/:article_id", () => {
 			});
 	});
 	test("status:404, responds with 404 not found when passed invalid id", () => {
-    const votesObject = {
+		const votesObject = {
 			inc_votes: -10,
 		};
 		return request(app)
@@ -121,11 +119,11 @@ describe("PATCH /api/articles/:article_id", () => {
 			.expect(404)
 			.then(({ body }) => {
 				const { msg } = body;
-				expect(msg).toEqual("No article found for article_id 999999");
+				expect(msg).toEqual("Not found");
 			});
 	});
-  test("status:400, responds with 404 not found when passed id that is not number", () => {
-    const votesObject = {
+	test("status:400, responds with 404 not found when passed id that is not number", () => {
+		const votesObject = {
 			inc_votes: -10,
 		};
 		return request(app)
@@ -137,8 +135,8 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(msg).toEqual("Bad request");
 			});
 	});
-  test("status:400, responds with 404 not found when passed inc_votes that is not number", () => {
-    const votesObject = {
+	test("status:400, responds with 404 not found when passed inc_votes that is not number", () => {
+		const votesObject = {
 			inc_votes: "cheese",
 		};
 		return request(app)
@@ -148,6 +146,60 @@ describe("PATCH /api/articles/:article_id", () => {
 			.then(({ body }) => {
 				const { msg } = body;
 				expect(msg).toEqual("Bad request");
+			});
+	});
+});
+
+
+describe(" /api/articles/:article_id/comments", () => {
+	test("responds with an array of comment objects", () => {
+		return request(app)
+			.get("/api/articles/1/comments")
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toBeInstanceOf(Array);
+				expect(comments.length).toBe(11);
+				comments.forEach((comment) => {
+					expect(comment).toEqual(
+						expect.objectContaining({
+							comment_id: expect.any(Number),
+							votes: expect.any(Number),
+							created_at: expect.any(String),
+							author: expect.any(String),
+							body: expect.any(String),
+						})
+					);
+				});
+			});
+	});
+
+	test("status:400, responds with 400 not found when passed id that is not number", () => {
+		return request(app)
+			.get("/api/articles/banana/comments")
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+	test("status:200, responds with empty array when passed article with no associated comments", () => {
+		return request(app)
+			.get("/api/articles/4/comments")
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toBeInstanceOf(Array);
+				expect(comments.length).toBe(0);
+			});
+	});
+	test("status:404, responds with 404 not found when passed non-existent id", () => {
+		return request(app)
+			.get("/api/articles/9998999/comments")
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
 			});
 	});
 });
@@ -201,3 +253,4 @@ describe("PATCH /api/articles/:article_id", () => {
 	  });
 	})
   })
+
