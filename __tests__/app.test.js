@@ -68,7 +68,7 @@ describe("GET /api/articles/:article_id", () => {
 			.expect(404)
 			.then(({ body }) => {
 				const { msg } = body;
-				expect(msg).toEqual("No article found for article_id 999999");
+				expect(msg).toEqual("Not found");
 			});
 	});
 	test("status:400, responds with 404 not found when passed id that is not number", () => {
@@ -119,7 +119,7 @@ describe("PATCH /api/articles/:article_id", () => {
 			.expect(404)
 			.then(({ body }) => {
 				const { msg } = body;
-				expect(msg).toEqual("No article found for article_id 999999");
+				expect(msg).toEqual("Not found");
 			});
 	});
 	test("status:400, responds with 404 not found when passed id that is not number", () => {
@@ -172,22 +172,33 @@ describe(" /api/articles/:article_id/comments", () => {
 				});
 			});
 	});
-	test("status:404, responds with 404 not found when passed invalid id", () => {
-		return request(app)
-			.get("/api/articles/999999/comments")
-			.expect(404)
-			.then(({ body }) => {
-				const { msg } = body;
-				expect(msg).toEqual("No article found for article_id 999999");
-			});
-	});
-	test("status:400, responds with 404 not found when passed id that is not number", () => {
+
+	test("status:400, responds with 400 not found when passed id that is not number", () => {
 		return request(app)
 			.get("/api/articles/banana/comments")
 			.expect(400)
 			.then(({ body }) => {
 				const { msg } = body;
 				expect(msg).toEqual("Bad request");
+			});
+	});
+	test("status:200, responds with empty array when passed article with no associated comments", () => {
+		return request(app)
+			.get("/api/articles/4/comments")
+			.expect(200)
+			.then(({ body }) => {
+				const { comments } = body;
+				expect(comments).toBeInstanceOf(Array);
+				expect(comments.length).toBe(0);
+			});
+	});
+	test("status:404, responds with 404 not found when passed non-existent id", () => {
+		return request(app)
+			.get("/api/articles/9998999/comments")
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
 			});
 	});
 });
