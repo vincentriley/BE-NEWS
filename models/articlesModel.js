@@ -1,4 +1,5 @@
 const db = require("../db/connection.js");
+const convertTimeStampToDate = require("../db/helpers/utils")
 
 const fetchArticles = (sortBy, order, topic) => {
 	const allowedSortBys = [
@@ -10,18 +11,8 @@ const fetchArticles = (sortBy, order, topic) => {
 		"votes",
 		"comment_count",
 	];
-	const allowedOrderByBools = ["true", "false"];
-	console.log(!allowedSortBys.includes(sortBy), "bool")
-	if (!allowedSortBys.includes(sortBy)) {
-		console.log("in conditional")
-		return Promise.reject({
-			status: 400,
-			msg: "Bad request",
-		});
-	}
-	console.log(order, "order")
-	if (order && !allowedOrderByBools.includes(order)) {
-		console.log("in conditional2")
+	const allowedOrderByBools = ["desc", "asc"];
+	if ((sortBy && !allowedSortBys.includes(sortBy)) || (order && !allowedOrderByBools.includes(order))) {
 		return Promise.reject({
 			status: 400,
 			msg: "Bad request",
@@ -90,6 +81,21 @@ const updateArticleVotes = (articleId, votes) => {
 		});
 };
 
+
+const addComment = (articleId, username, body) => {
+	return db
+		.query(
+			`INSERT INTO comments (body, author, article_id)
+					VALUES($1, $2, $3) RETURNING *`,
+			[body, username, articleId]
+		)
+		.then(({rows}) => {
+			const comment = rows[0]
+			return comment
+		});
+};
+
+
 const fetchArticleComments = (articleId) => {
 	return db
 		.query("SELECT * FROM comments WHERE article_id = $1", [articleId])
@@ -98,9 +104,5 @@ const fetchArticleComments = (articleId) => {
 		});
 };
 
-module.exports = {
-	fetchArticles,
-	fetchArticleById,
-	updateArticleVotes,
-	fetchArticleComments,
-};
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment };
+

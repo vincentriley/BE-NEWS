@@ -1,5 +1,10 @@
-
-const {fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments} = require("../models/articlesModel")
+const {
+	fetchArticles,
+	fetchArticleById,
+	updateArticleVotes,
+	addComment,
+	fetchArticleComments,
+} = require("../models/articlesModel");
 
 const getArticles = (req, res, next) => {
 	const {sort_by : sortBy, order, topic} = req.query
@@ -34,23 +39,37 @@ const patchArticleById = (req, res, next) => {
 		});
 };
 
+const postComment = (req, res, next) => {
+	const { article_id: articleId } = req.params;
+	const { username, body } = req.body;
+
+	addComment(articleId, username, body)
+		.then((data) => {
+			res.status(201).send({ comment: data });
+		})
+		.catch((err) => {
+			next(err);
+		});
+};
 
 const getArticleComments = (req, res, next) => {
 	const { article_id: articleId } = req.params;
-	const promise1 = fetchArticleById(articleId);
-	const promise2 = fetchArticleComments(articleId)
+	const pendingComments = fetchArticleComments(articleId);
+	const pendingArticleCheck = fetchArticleById(articleId);
 
-
-	Promise.all([promise1, promise2]).catch((err) => {
-		next(err);
-	})
-	.then((data) => {
-		res.status(200).send({ comments: data });
-	})
-	.catch((err) => {
-		next(err);
-	});
+	Promise.all([pendingComments, pendingArticleCheck])
+		.then(([data]) => {
+			res.status(200).send({ comments: data });
+		})
+		.catch((err) => {
+			next(err);
+		});
 };
 
-module.exports = { getArticles, getArticleById, patchArticleById, getArticleComments };
-
+module.exports = {
+	getArticles,
+	getArticleById,
+	patchArticleById,
+	postComment,
+	getArticleComments,
+};
