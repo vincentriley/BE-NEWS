@@ -1,5 +1,19 @@
 const db = require("../db/connection.js");
 
+const fetchArticles = () => {
+	return db
+		.query(
+			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.article_id) AS int) AS comment_count FROM articles
+		LEFT JOIN comments 
+		ON articles.article_id = comments.article_id
+		GROUP BY articles.article_id
+		ORDER BY articles.created_at DESC;`
+		)
+		.then(({ rows }) => {
+			return rows;
+		});
+};
+
 const fetchArticleById = (articleId) => {
 	return db
 		.query(
@@ -46,6 +60,7 @@ const updateArticleVotes = (articleId, votes) => {
 		});
 };
 
+
 const fetchArticleComments = (articleId) => {
 	return db
 		.query("SELECT * FROM comments WHERE article_id = $1", [articleId])
@@ -54,4 +69,5 @@ const fetchArticleComments = (articleId) => {
 		});
 };
 
-module.exports = { fetchArticleById, updateArticleVotes, fetchArticleComments };
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments };
+

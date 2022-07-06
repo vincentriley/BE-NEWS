@@ -1,3 +1,5 @@
 node_modules
 .env.*
 zInstructions.md
+practice-db.txt
+practice-query.sql
