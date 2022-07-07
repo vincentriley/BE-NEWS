@@ -4,17 +4,23 @@ const {
 	updateArticleVotes,
 	addComment,
 	fetchArticleComments,
+	checkTopicExists,
 } = require("../models/articlesModel");
 
 const getArticles = (req, res, next) => {
-	const {sort_by : sortBy, order, topic} = req.query
-    fetchArticles(sortBy, order, topic).then((data) => {
-        res.status(200).send({articles: data})
-    }).catch((err) => {
-        next(err)
-    })
-}
+	const { sort_by: sortBy, order, topic } = req.query;
+	const pendingTopicCheck = checkTopicExists(topic);
+	const pendingArticles = fetchArticles(sortBy, order, topic);
+	
 
+	Promise.all([pendingArticles, pendingTopicCheck])
+		.then(([data]) => {
+			res.status(200).send({ articles: data });
+		})
+		.catch((err) => {
+			next(err);
+		});
+};
 
 const getArticleById = (req, res, next) => {
 	const { article_id: articleId } = req.params;

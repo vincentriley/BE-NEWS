@@ -74,7 +74,7 @@ const updateArticleVotes = (articleId, votes) => {
 			if (!article) {
 				return Promise.reject({
 					status: 404,
-					msg: `Not found`,
+					msg: `Not found`
 				});
 			}
 			return article;
@@ -104,5 +104,21 @@ const fetchArticleComments = (articleId) => {
 		});
 };
 
-module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment };
+const checkTopicExists = (topic) => {
+	const topicString = topic ? topic : "%"
+	return db
+		.query("SELECT * FROM topics WHERE slug LIKE $1", [topicString])
+		.then(({rows}) => {
+			if (rows.length === 0) {
+				return Promise.reject({
+					status: 404,
+					msg: `Not found`
+				})
+			} else {
+				return Promise.resolve()
+			}
+		});
+}
+
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment, checkTopicExists };
 

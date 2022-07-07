@@ -281,9 +281,9 @@ describe("GET /api/articles", () => {
 				
 			});
 	});
-	test("status: 200, responds with empty array when passed topic with no associated articles", () => {
+	test("status: 200, responds with empty array when passed topic which exists but has no associated articles", () => {
 		return request(app)
-			.get("/api/articles?sort_by=author&order=desc&topic=southstand")
+			.get("/api/articles?sort_by=author&order=desc&topic=paper")
 			.expect(200)
 			.then(({ body }) => {
 				const { articles } = body;
@@ -291,18 +291,27 @@ describe("GET /api/articles", () => {
 				expect(articles.length).toBe(0);
 			});
 	});
-	test("status: 400, responds with 400 error when passed order value which is not true or false", () => {
+	test("status: 404, responds with 404 error when passed topic which does not exist", () => {
 		return request(app)
-			.get("/api/articles?sort_by=author&order=billybremner&topic=southstand")
+			.get("/api/articles?sort_by=author&order=desc&topic=southstand")
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found")
+			});
+	});
+	test("status: 400, responds with 400 error when passed order value which is not asc or desc", () => {
+		return request(app)
+			.get("/api/articles?sort_by=author&order=cheesewedge&topic=cats")
 			.expect(400)
 			.then(({ body }) => {
 				const { msg } = body;
 				expect(msg).toEqual("Bad request");
 			});
 	});
-	test("status: 400, responds with 400 error when passed order value which is not true or false", () => {
+	test("status: 400, responds with 400 error when passed sort_by which does not exist", () => {
 		return request(app)
-			.get("/api/articles?sort_by=MateuszKlich&order=asc&topic=southstand")
+			.get("/api/articles?sort_by=MateuszKlich&order=asc&topic=mitch")
 			.expect(400)
 			.then(({ body }) => {
 				const { msg } = body;
