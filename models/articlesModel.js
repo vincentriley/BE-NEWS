@@ -1,14 +1,34 @@
 const db = require("../db/connection.js");
 const convertTimeStampToDate = require("../db/helpers/utils")
 
-const fetchArticles = () => {
+const fetchArticles = (sortBy, order, topic) => {
+	const allowedSortBys = [
+		"author",
+		"title",
+		"article_id",
+		"topic",
+		"created_at",
+		"votes",
+		"comment_count",
+	];
+	const allowedOrderByBools = ["desc", "asc"];
+	if ((sortBy && !allowedSortBys.includes(sortBy)) || (order && !allowedOrderByBools.includes(order))) {
+		return Promise.reject({
+			status: 400,
+			msg: "Bad request",
+		});
+	}
+	const sortByString = sortBy ? sortBy : "created_at";
+	const orderString = order ? order : "DESC";
+	const topicString = topic ? `WHERE articles.topic = '${topic}'` : "";
 	return db
 		.query(
 			`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, CAST(COUNT(comments.article_id) AS int) AS comment_count FROM articles
-		LEFT JOIN comments 
-		ON articles.article_id = comments.article_id
-		GROUP BY articles.article_id
-		ORDER BY articles.created_at DESC;`
+			LEFT JOIN comments 
+			ON articles.article_id = comments.article_id
+			${topicString}
+			GROUP BY articles.article_id
+			ORDER BY articles.${sortByString} ${orderString};`
 		)
 		.then(({ rows }) => {
 			return rows;
@@ -54,7 +74,7 @@ const updateArticleVotes = (articleId, votes) => {
 			if (!article) {
 				return Promise.reject({
 					status: 404,
-					msg: `Not found`,
+					msg: `Not found`
 				});
 			}
 			return article;
@@ -95,5 +115,21 @@ const removeComment = (commentId) => {
 	})
 }
 
-module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment, removeComment };
+const checkTopicExists = (topic) => {
+	const topicString = topic ? topic : "%"
+	return db
+		.query("SELECT * FROM topics WHERE slug LIKE $1", [topicString])
+		.then(({rows}) => {
+			if (rows.length === 0) {
+				return Promise.reject({
+					status: 404,
+					msg: `Not found`
+				})
+			} else {
+				return Promise.resolve()
+			}
+		});
+}
+
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment, removeComment, checkTopicExists };
 

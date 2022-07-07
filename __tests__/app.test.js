@@ -151,6 +151,7 @@ describe("PATCH /api/articles/:article_id", () => {
 });
 
 
+
 describe(" /api/articles/:article_id/comments", () => {
 	test("responds with an array of comment objects", () => {
 		return request(app)
@@ -228,31 +229,96 @@ describe(" /api/articles/:article_id/comments", () => {
   })
 
 
-  describe("GET /api/articles", () => {
+
+
+describe("GET /api/articles", () => {
 	test("status: 200, responds with array of articles", () => {
-	  return request(app)
-	  .get("/api/articles")
-	  .expect(200)
-	  .then(({ body }) => {
-		const { articles } = body;
-		expect(articles).toBeInstanceOf(Array);
-		expect(articles.length).toBe(12);
-		articles.forEach((article) => {
-		  expect(article).toEqual(
-			expect.objectContaining({
-			  author: expect.any(String),
-			  title: expect.any(String),
-			  article_id: expect.any(Number),
-			  topic: expect.any(String),
-			  created_at: expect.any(String),
-			  votes: expect.any(Number),
-			  comment_count: expect.any(Number),
-			})
-		  );
-		});
-	  });
-	})
-  })
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeInstanceOf(Array);
+				expect(articles.length).toBe(12);
+				articles.forEach((article) => {
+					expect(article).toEqual(
+						expect.objectContaining({
+							author: expect.any(String),
+							title: expect.any(String),
+							article_id: expect.any(Number),
+							topic: expect.any(String),
+							created_at: expect.any(String),
+							votes: expect.any(Number),
+							comment_count: expect.any(Number),
+						})
+					);
+				});
+			});
+	});
+	test("status: 200, responds with array of articles correctly sorted and filtered", () => {
+		return request(app)
+			.get("/api/articles?sort_by=author&order=desc&topic=mitch")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeInstanceOf(Array);
+				expect(articles.length).toBe(11);
+				expect(articles).toBeSorted({key: "author", descending: true})
+				articles.forEach((article) => {
+					expect(article.topic).toBe("mitch")
+				})
+			});
+	});
+	test("status: 200, responds with array of articles correctly sorted and filtered using defaults", () => {
+		return request(app)
+			.get("/api/articles")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeInstanceOf(Array);
+				expect(articles.length).toBe(12);
+				expect(articles).toBeSorted({key: "created_at", descending: true})
+				
+			});
+	});
+	test("status: 200, responds with empty array when passed topic which exists but has no associated articles", () => {
+		return request(app)
+			.get("/api/articles?sort_by=author&order=desc&topic=paper")
+			.expect(200)
+			.then(({ body }) => {
+				const { articles } = body;
+				expect(articles).toBeInstanceOf(Array);
+				expect(articles.length).toBe(0);
+			});
+	});
+	test("status: 404, responds with 404 error when passed topic which does not exist", () => {
+		return request(app)
+			.get("/api/articles?sort_by=author&order=desc&topic=southstand")
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found")
+			});
+	});
+	test("status: 400, responds with 400 error when passed order value which is not asc or desc", () => {
+		return request(app)
+			.get("/api/articles?sort_by=author&order=cheesewedge&topic=cats")
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+	test("status: 400, responds with 400 error when passed sort_by which does not exist", () => {
+		return request(app)
+			.get("/api/articles?sort_by=MateuszKlich&order=asc&topic=mitch")
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+});
 
 describe("POST /api/articles/:article_id/comments", () => {
 	test("returns a correctly formatted comment object", () => {
