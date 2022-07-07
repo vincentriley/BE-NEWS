@@ -122,8 +122,8 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(msg).toEqual("Not found");
 			});
 	});
-  test("status:400, responds with 400 not found when passed id that is not number", () => {
-    const votesObject = {
+	test("status:400, responds with 400 not found when passed id that is not number", () => {
+		const votesObject = {
 			inc_votes: -10,
 		};
 		return request(app)
@@ -135,8 +135,8 @@ describe("PATCH /api/articles/:article_id", () => {
 				expect(msg).toEqual("Bad request");
 			});
 	});
-  test("status:400, responds with 400 when passed inc_votes that is not number", () => {
-    const votesObject = {
+	test("status:400, responds with 400 when passed inc_votes that is not number", () => {
+		const votesObject = {
 			inc_votes: "cheese",
 		};
 		return request(app)
@@ -149,8 +149,6 @@ describe("PATCH /api/articles/:article_id", () => {
 			});
 	});
 });
-
-
 
 describe(" /api/articles/:article_id/comments", () => {
 	test("responds with an array of comment objects", () => {
@@ -205,31 +203,27 @@ describe(" /api/articles/:article_id/comments", () => {
 	});
 });
 
-
-  describe("GET /api/users", () => {
+describe("GET /api/users", () => {
 	test("status: 200, responds with array of users", () => {
-	  return request(app)
-	  .get("/api/users")
-	  .expect(200)
-	  .then(({ body }) => {
-		const { users } = body;
-		expect(users).toBeInstanceOf(Array);
-		expect(users.length).toBe(4);
-		users.forEach((user) => {
-		  expect(user).toEqual(
-			expect.objectContaining({
-			  name: expect.any(String),
-			  username: expect.any(String),
-			  avatar_url: expect.any(String),
-			})
-		  );
-		});
-	  });
-	})
-  })
-
-
-
+		return request(app)
+			.get("/api/users")
+			.expect(200)
+			.then(({ body }) => {
+				const { users } = body;
+				expect(users).toBeInstanceOf(Array);
+				expect(users.length).toBe(4);
+				users.forEach((user) => {
+					expect(user).toEqual(
+						expect.objectContaining({
+							name: expect.any(String),
+							username: expect.any(String),
+							avatar_url: expect.any(String),
+						})
+					);
+				});
+			});
+	});
+});
 
 describe("GET /api/articles", () => {
 	test("status: 200, responds with array of articles", () => {
@@ -263,10 +257,10 @@ describe("GET /api/articles", () => {
 				const { articles } = body;
 				expect(articles).toBeInstanceOf(Array);
 				expect(articles.length).toBe(11);
-				expect(articles).toBeSorted({key: "author", descending: true})
+				expect(articles).toBeSorted({ key: "author", descending: true });
 				articles.forEach((article) => {
-					expect(article.topic).toBe("mitch")
-				})
+					expect(article.topic).toBe("mitch");
+				});
 			});
 	});
 	test("status: 200, responds with array of articles correctly sorted and filtered using defaults", () => {
@@ -277,8 +271,7 @@ describe("GET /api/articles", () => {
 				const { articles } = body;
 				expect(articles).toBeInstanceOf(Array);
 				expect(articles.length).toBe(12);
-				expect(articles).toBeSorted({key: "created_at", descending: true})
-				
+				expect(articles).toBeSorted({ key: "created_at", descending: true });
 			});
 	});
 	test("status: 200, responds with empty array when passed topic which exists but has no associated articles", () => {
@@ -297,7 +290,7 @@ describe("GET /api/articles", () => {
 			.expect(404)
 			.then(({ body }) => {
 				const { msg } = body;
-				expect(msg).toEqual("Not found")
+				expect(msg).toEqual("Not found");
 			});
 	});
 	test("status: 400, responds with 400 error when passed order value which is not asc or desc", () => {
@@ -324,113 +317,109 @@ describe("POST /api/articles/:article_id/comments", () => {
 	test("returns a correctly formatted comment object", () => {
 		const commentObject = {
 			username: "butter_bridge",
-			body: "Leeds United Champions League Champions 2024"
-		}
+			body: "Leeds United Champions League Champions 2024",
+		};
 		return request(app)
-		.post("/api/articles/2/comments")
-		.send(commentObject)
-		.expect(201)
-		.then(({body}) => {
-			const {comment} = body
-			expect(comment).toEqual(
-				expect.objectContaining({
-					comment_id: expect.any(Number),
-					body: expect.any(String),
-					article_id: expect.any(Number),
-					author: expect.any(String),
-					votes: expect.any(Number),
-					created_at: expect.any(String),
-
-				})
-			)
-		})
-	})
+			.post("/api/articles/2/comments")
+			.send(commentObject)
+			.expect(201)
+			.then(({ body }) => {
+				const { comment } = body;
+				expect(comment).toEqual(
+					expect.objectContaining({
+						comment_id: expect.any(Number),
+						body: expect.any(String),
+						article_id: expect.any(Number),
+						author: expect.any(String),
+						votes: expect.any(Number),
+						created_at: expect.any(String),
+					})
+				);
+			});
+	});
 	test("returns with 404 when article_id not found", () => {
 		const commentObject = {
 			username: "butter_bridge",
-			body: "Leeds United Champions League Champions 2024"
-		}
+			body: "Leeds United Champions League Champions 2024",
+		};
 		return request(app)
-		.post("/api/articles/9999999/comments")
-		.send(commentObject)
-		.expect(404)
-		.then(({ body }) => {
-			const { msg } = body;
-			expect(msg).toEqual("Not found");
-		});
-	})
+			.post("/api/articles/9999999/comments")
+			.send(commentObject)
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
+			});
+	});
 	test("returns with 404 when username not found", () => {
 		const commentObject = {
 			username: "Dave_Hockaday",
-			body: "Leeds United Champions League Champions 2024"
-		}
+			body: "Leeds United Champions League Champions 2024",
+		};
 		return request(app)
-		.post("/api/articles/2/comments")
-		.send(commentObject)
-		.expect(404)
-		.then(({ body }) => {
-			const { msg } = body;
-			expect(msg).toEqual("Not found");
-		});
-	})
+			.post("/api/articles/2/comments")
+			.send(commentObject)
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
+			});
+	});
 	test("returns 400 when passed invalid article_id format", () => {
 		const commentObject = {
 			username: "Dave_Hockaday",
-			body: "Leeds United Champions League Champions 2024"
-		}
+			body: "Leeds United Champions League Champions 2024",
+		};
 		return request(app)
-		.post("/api/articles/MassimoCellino/comments")
-		.send(commentObject)
-		.expect(400)
-		.then(({ body }) => {
-			const { msg } = body;
-			expect(msg).toEqual("Bad request");
-		});
-	})
+			.post("/api/articles/MassimoCellino/comments")
+			.send(commentObject)
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
 	test("returns 400 when passed comment body with missing fields", () => {
 		const commentObject = {
-			username: "Dave_Hockaday"
-		}
+			username: "Dave_Hockaday",
+		};
 		return request(app)
-		.post("/api/articles/MassimoCellino/comments")
-		.send(commentObject)
-		.expect(400)
-		.then(({ body }) => {
-			const { msg } = body;
-			expect(msg).toEqual("Bad request");
-		});
-	})
-})
-
+			.post("/api/articles/MassimoCellino/comments")
+			.send(commentObject)
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+});
 
 describe("GET /api", () => {
 	test("returns JSON of api endpoints", () => {
-		return request(app)
-		.get("/api")
-		.expect(200)
-})		
+		return request(app).get("/api").expect(200);
+	});
+});
 
 describe("DELETE /api/comments/:comment_id", () => {
 	test("returns 204 when passed valid comment id", () => {
-		return request(app)
-		.delete("/api/comments/2")
-		.expect(204)
-	})
+		return request(app).delete("/api/comments/2").expect(204);
+	});
 	test("returns 404 when passed valid comment id which does not exist", () => {
 		return request(app)
-		.delete("/api/comments/666")
-		.expect(404)
-		.then(({ body }) => {
-			const { msg } = body;
-			expect(msg).toEqual("Not found");
-		});
-	})
+			.delete("/api/comments/666")
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
+			});
+	});
 	test("returns 400 when passed invalid commentid", () => {
 		return request(app)
-		.delete("/api/comments/HuddersfieldFCAreDogBotherers")
-		.expect(400)
-		.then(({ body }) => {
-			const { msg } = body;
-			expect(msg).toEqual("Bad request");
-		});
-	})
+			.delete("/api/comments/HuddersfieldFCAreDogBotherers")
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+});
