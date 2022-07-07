@@ -1,4 +1,7 @@
 const express = require("express");
+
+const getApi = require("./controllers/apiController")
+
 const {getTopics} = require("./controllers/topicsController")
 
 const {getArticleComments, getArticles, getArticleById, patchArticleById, postComment} = require("./controllers/articlesController")
@@ -7,6 +10,8 @@ const getUsers = require("./controllers/usersController")
 
 const app = express();
 app.use(express.json());
+
+app.get("/api", getApi)
 
 app.get("/api/topics", getTopics);
 
