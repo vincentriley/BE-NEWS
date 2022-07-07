@@ -403,6 +403,13 @@ describe("POST /api/articles/:article_id/comments", () => {
 })
 
 
+describe("GET /api", () => {
+	test("returns JSON of api endpoints", () => {
+		return request(app)
+		.get("/api")
+		.expect(200)
+})		
+
 describe("DELETE /api/comments/:comment_id", () => {
 	test("returns 204 when passed valid comment id", () => {
 		return request(app)
@@ -427,4 +434,3 @@ describe("DELETE /api/comments/:comment_id", () => {
 			expect(msg).toEqual("Bad request");
 		});
 	})
-})
