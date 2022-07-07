@@ -2,32 +2,28 @@ const express = require("express");
 
 const getApi = require("./controllers/apiController")
 
-const {getTopics} = require("./controllers/topicsController")
+const topicsRouter = require("./routes/topicsRouter")
 
-const {getArticleComments, getArticles, getArticleById, patchArticleById, postComment, deleteComment} = require("./controllers/articlesController")
+const articlesRouter = require("./routes/articlesRouter")
 
-const getUsers = require("./controllers/usersController")
+const usersRouter = require("./routes/usersRouter")
+
+const commentsRouter = require("./routes/commentsRouter")
 
 const app = express();
+
 app.use(express.json());
 
 app.get("/api", getApi)
 
-app.get("/api/topics", getTopics);
+app.use("/api/topics", topicsRouter)
 
-app.get("/api/articles", getArticles)
+app.use("/api/articles", articlesRouter)
 
-app.get("/api/articles/:article_id", getArticleById)
+app.use("/api/users", usersRouter)
 
-app.patch("/api/articles/:article_id", patchArticleById)
+app.use("/api/comments", commentsRouter)
 
-app.get("/api/users", getUsers)
-
-app.post("/api/articles/:article_id/comments", postComment)
-
-app.get("/api/articles/:article_id/comments", getArticleComments)
-
-app.delete("/api/comments/:comment_id", deleteComment)
 
 
 
