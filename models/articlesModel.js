@@ -104,6 +104,7 @@ const fetchArticleComments = (articleId) => {
 		});
 };
 
+
 const removeComment = (commentId) => {
 	return db.query("DELETE FROM comments WHERE comment_id = $1", [commentId]).then(({rowCount}) => {
 		if (rowCount === 0) {
@@ -114,6 +115,7 @@ const removeComment = (commentId) => {
 		}
 	})
 }
+
 
 const checkTopicExists = (topic) => {
 	const topicString = topic ? topic : "%"
@@ -131,5 +133,7 @@ const checkTopicExists = (topic) => {
 		});
 }
 
+
 module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment, removeComment, checkTopicExists };
+
 
