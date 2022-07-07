@@ -401,3 +401,30 @@ describe("POST /api/articles/:article_id/comments", () => {
 		});
 	})
 })
+
+
+describe("DELETE /api/comments/:comment_id", () => {
+	test("returns 204 when passed valid comment id", () => {
+		return request(app)
+		.delete("/api/comments/2")
+		.expect(204)
+	})
+	test("returns 404 when passed valid comment id which does not exist", () => {
+		return request(app)
+		.delete("/api/comments/666")
+		.expect(404)
+		.then(({ body }) => {
+			const { msg } = body;
+			expect(msg).toEqual("Not found");
+		});
+	})
+	test("returns 400 when passed invalid commentid", () => {
+		return request(app)
+		.delete("/api/comments/HuddersfieldFCAreDogBotherers")
+		.expect(400)
+		.then(({ body }) => {
+			const { msg } = body;
+			expect(msg).toEqual("Bad request");
+		});
+	})
+})
