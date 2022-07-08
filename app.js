@@ -29,7 +29,7 @@ app.use("/api/comments", commentsRouter)
 
 
 app.use((err, req, res, next) => {
-    if (err.code === "22P02") {
+    if (err.code === "22P02" || err.code === "23502") {
         err.status = 400
         err.msg = "Bad request"
     }
