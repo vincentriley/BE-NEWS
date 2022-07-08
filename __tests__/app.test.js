@@ -423,3 +423,98 @@ describe("DELETE /api/comments/:comment_id", () => {
 			});
 	});
 });
+
+describe("GET /api/users/:username", () => {
+	test("status: 200, responds with user object when passed valid username as parameter", () => {
+		return request(app)
+			.get("/api/users/butter_bridge")
+			.expect(200)
+			.then(({ body }) => {
+				const { user } = body;
+					expect(user).toEqual(
+						expect.objectContaining({
+							name: expect.any(String),
+							username: expect.any(String),
+							avatar_url: expect.any(String),
+						})
+					);
+			});
+	})
+	test("status: 404, responds with user object when passed invalid username as parameter", () => {
+		return request(app)
+			.get("/api/users/MichaelTonge")
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+					expect(msg).toEqual("Not found");
+			});
+	})
+})
+
+describe("PATCH /api/comments/:comment_id", () => {
+	test("status:200, responds with comment object with correctly incremented votes when passed positive value", () => {
+		const votesObject = {
+			inc_votes: 10,
+		};
+		return request(app)
+			.patch("/api/comments/2")
+			.send(votesObject)
+			.expect(200)
+			.then(({ body }) => {
+				const { comment } = body;
+				expect(comment.votes).toBe(24);
+			});
+	});
+	test("status:200, responds with comment object with correctly incremented votes when passed negative value", () => {
+		const votesObject = {
+			inc_votes: -2,
+		};
+		return request(app)
+			.patch("/api/comments/1")
+			.send(votesObject)
+			.expect(200)
+			.then(({ body }) => {
+				const { comment } = body;
+				expect(comment.votes).toBe(14);
+			});
+	});
+	test("status:404, responds with 404 not found when passed invalid id", () => {
+		const votesObject = {
+			inc_votes: -10,
+		};
+		return request(app)
+			.patch("/api/comments/999999")
+			.send(votesObject)
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
+			});
+	});
+	test("status:400, responds with 400 not found when passed id that is not number", () => {
+		const votesObject = {
+			inc_votes: -10,
+		};
+		return request(app)
+			.patch("/api/comments/banana")
+			.send(votesObject)
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+	test("status:400, responds with 400 when passed inc_votes that is not number", () => {
+		const votesObject = {
+			inc_votes: "cheese",
+		};
+		return request(app)
+			.patch("/api/comments/2")
+			.send(votesObject)
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+});
