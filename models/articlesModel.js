@@ -118,6 +118,21 @@ const checkTopicExists = (topic) => {
 }
 
 
-module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment, checkTopicExists };
+const addArticle = (article) => {
+	return db
+		.query(
+			`INSERT INTO articles (author, title, body, topic)
+					VALUES($1, $2, $3, $4) RETURNING *`,
+			[article.author, article.title, article.body, article.topic]
+		)
+		.then(({rows}) => {
+			const {article_id : articleId} = rows[0]
+			return fetchArticleById(articleId)
+		})
+};
+
+
+
+module.exports = { fetchArticles, fetchArticleById, updateArticleVotes, fetchArticleComments, addComment, checkTopicExists, addArticle };
 
 

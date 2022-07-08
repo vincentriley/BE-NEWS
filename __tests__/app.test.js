@@ -518,3 +518,78 @@ describe("PATCH /api/comments/:comment_id", () => {
 			});
 	});
 });
+
+describe("POST_/api/articles", () => {
+	test("status: 200, responds with correctly formatted article object", () => {
+		const articleObject = {
+			author: "butter_bridge",
+			title: "OHHHHH",
+			body: "Brian McDermott",
+			topic: "cats"
+		}
+		return request(app)
+		.post("/api/articles")
+		.send(articleObject)
+		.expect(201)
+		.then(({body}) => {
+			const {article} = body
+			expect(article).toEqual(expect.objectContaining({
+				article_id: expect.any(Number),
+				title: expect.any(String),
+				topic: expect.any(String),
+				author: expect.any(String),
+				body: expect.any(String),
+				created_at: expect.any(String),
+				votes: expect.any(Number),
+				comment_count: expect.any(Number),
+			}));
+		})
+	})
+	test("returns with 404 when username not found", () => {
+		const articleObject = {
+			author: "brian_mcdermott",
+			title: "OHHHHH",
+			body: "Brian McDermott",
+			topic: "cats"
+		}
+		return request(app)
+			.post("/api/articles")
+			.send(articleObject)
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
+			});
+	});
+	test("returns with 404 when topic not found", () => {
+		const articleObject = {
+			author: "butter_bridge",
+			title: "OHHHHH",
+			body: "Brian McDermott",
+			topic: "brian_mcdermott"
+		}
+		return request(app)
+			.post("/api/articles")
+			.send(articleObject)
+			.expect(404)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Not found");
+			});
+	});
+	test("returns 400 when passed invalid article body", () => {
+		const articleObject = {
+			author: "butter_bridge",
+			title: "OHHHHH"
+		}
+		return request(app)
+			.post("/api/articles")
+			.send(articleObject)
+			.expect(400)
+			.then(({ body }) => {
+				const { msg } = body;
+				expect(msg).toEqual("Bad request");
+			});
+	});
+
+})

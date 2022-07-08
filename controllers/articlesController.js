@@ -4,8 +4,8 @@ const {
 	updateArticleVotes,
 	addComment,
 	fetchArticleComments,
-	removeComment,
 	checkTopicExists,
+	addArticle
 } = require("../models/articlesModel");
 
 const getArticles = (req, res, next) => {
@@ -73,6 +73,17 @@ const getArticleComments = (req, res, next) => {
 		});
 };
 
+const postArticle = (req, res, next) => {
+	const article = req.body
+	addArticle(article).then((data) => {
+		res.status(201).send({article: data})
+	})
+	.catch((err) => {
+		console.log(err)
+		next(err)
+	})
+}
+
 
 
 module.exports = {
@@ -80,5 +91,6 @@ module.exports = {
 	getArticleById,
 	patchArticleById,
 	postComment,
-	getArticleComments
+	getArticleComments,
+	postArticle
 };
